@@ -1,0 +1,39 @@
+body {
+	position: relative;  
+	width:80%;
+	margin: 0 auto;
+	font-family:"Skia";                                                                                                                                                                                                                                                                                                                                                                                                    
+}
+
+h2 {
+
+	font-family:  "Papyrus", 'Sand', "Textile", Arial,sans-serif;
+	margin-bottom: 0px;
+}
+
+#title {
+	font-family: 'Marker Felt', "Helvetica Rounded", Arial, sans-serif;
+	font-size: bold;
+	text-align: center;
+}
+
+p{
+	font-size: 15px;
+	font-family:"Trebuchet MS","Lucida Grande",Verdana, "Geneva", sans-serif;
+	color:rgb(68,68,68);
+	margin:0px;
+}
+
+ul{
+	margin-top: 6px;
+	margin-bottom:8px;
+	font-size:18px;
+}
+
+
+
+img {
+	margin: 20px;
+}
+
+

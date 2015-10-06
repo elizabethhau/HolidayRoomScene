@@ -1,0 +1,426 @@
+
+<html>
+
+  <head>
+    <title>Emily Cetlin and Elizabeth Hau Final Project Beta Version</title>
+    <style>
+      
+      canvas {
+          display: block;
+          margin: 10px auto;
+          width: 80%;
+          height: 500px;
+      }
+    </style>
+    <script src="http://cs.wellesley.edu/~cs307/threejs/libs/three.min.js"></script>
+    <script src="http://cs.wellesley.edu/~cs307/threejs/libs/OrbitControls.js"></script>
+    <script src="http://cs.wellesley.edu/~cs307/threejs/libs/tw.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <link type = "text/css" rel = "stylesheet" href="stylesheet.css"/>
+
+   <script src = "table.js"></script> 
+    <script src = "textureLoading.js"></script>
+    <script src = "evergreenTree.js"></script>
+    <script src = "star.js"></script>
+    <script src = "christmasLights.js"></script>
+    <script src = "room.js"></script>
+    <script src = "createTV.js"></script>
+    <script src = "roomDecorations.js"></script>
+    <script src = "couch.js"></script>
+    <script src = "vase.js"></script>
+  </head>
+<body>
+<h1 id = "title" style = "margin-top:10px"><span style = 'color:red'>Holiday Room Scene!</span></h1>
+
+<script>
+/* This snippet of jQuery code makes the color of the letters in "Holiday Room Scene!" alternate */
+$( "span" ).each(function( index ) {
+  var originalText = $( this ).text();
+  var newText = "";
+  for( var i = 0; i < originalText.length; i++)
+  {
+      if (i % 2 === 0)
+        newText += "<span style = 'color:green'>" + originalText.charAt(i) + "</span>";  
+      else
+        newText += originalText.charAt(i);
+  }
+  $( this ).html(newText);
+});
+
+</script>
+
+<p style="text-align:center; font-family: Andale Mono"> 
+CS 307 Computer Graphics Final Project by Emily Cetlin and Elizabeth Hau 
+</p>
+
+<div>
+<h2 id = "scene"><em>The Scene</em></h2>
+
+
+<script>
+/* This program creates a holiday-themed room scene.
+ * The room has a Christmas tree (that has texture, lights, and a star on top), presents, 
+ * tables, a couch, a TV, a vase on one of the tables, and paintings on the walls as decorations.
+ */
+
+// create the scene and initialize necessary variables
+var scene = new THREE.Scene();
+var roomSize = 100;
+var treeHeight = 2*roomSize-10;
+var treeWidth =  1.25*roomSize;
+var lightArray = [];
+var time = new Date().getSeconds();
+var treeTexture = textureMaterial("treeTexture.jpg");
+var barkTexture = textureMaterial("treeBark.jpg");
+var presentTexture1 = textureMaterial("Present1.jpg");
+var presentTexture2 = textureMaterial("Present2.jpg");
+var presentTexture3 = textureMaterial("Present3.jpg");
+var presentTexture4 = textureMaterial("Present4.jpg");
+var presentTexture5 = textureMaterial("Present5.jpg");
+var presentTexture6 = textureMaterial("Present6.jpg");
+var presentTexture7 = textureMaterial("Present7.jpg");
+var presentTexture8 = textureMaterial("Present8.jpg");
+var presentTexture9 = textureMaterial("Present9.jpg");
+var presentTexture10 = textureMaterial("Present10.jpg");
+var presentTexture11 = textureMaterial("Present11.jpg");
+var presentTexture12 = textureMaterial("Present12.jpg");
+var presentTexture13 = textureMaterial("Present13.jpg");
+var presentTexture14 = textureMaterial("Present14.jpg");
+var presentTexture15 = textureMaterial("Present15.jpg");
+
+var treeProperties = {
+  segmentHeight: treeHeight/4,
+  topWidthA: 0,
+  topWidthB: treeWidth/4,
+  midWidthA: treeWidth/6,
+  midWidthB: treeWidth/3,
+  botWidthA: treeWidth/4,
+  botWidthB: treeWidth/2,
+};
+
+
+// ==================================================================
+// adding things to the scene
+
+var room = createRoom(2*roomSize,'roomWallPaper.jpg','ceiling.jpg','floor.jpg');
+scene.add(room);
+
+var star = createStar(15, 2);
+
+var xmas = evergreenTree(2*roomSize-10,1.25*roomSize, treeTexture, barkTexture);
+var lights = addTreeLights();
+var transY = -roomSize;
+var transX = 0.75*roomSize;
+var transZ = -0.75*roomSize;
+xmas.position.set(transX,transY,transZ);
+xmas.rotation.y=Math.PI;
+lights.position.set(transX,transY,transZ);
+star.position.set(transX,roomSize-10,transZ); 
+
+scene.add(lights);
+scene.add(xmas);
+scene.add(star);
+
+var skirt = createSkirt(3*roomSize/4);
+skirt.position.set(0.75*roomSize, -roomSize, -0.75*roomSize);
+scene.add(skirt);
+
+var couch = createCouch(100,75,50, new THREE.MeshPhongMaterial({color: new THREE.Color(0xAA7243)}));
+couch.position.set(-roomSize-25,-roomSize,0.5*roomSize);
+couch.rotation.y=1/2*Math.PI;
+scene.add(couch);
+var windowColor = new THREE.Color(0x993300);
+
+
+var tableHeight = 0.5*roomSize;
+var tableWidth = roomSize;
+var tableColor = 0x993300;
+
+// table by the tree
+var table = createTexturedTable(tableHeight,tableWidth, 2*tableWidth/3, 'table.jpg',1);
+table.position.set(-roomSize*1.5+(tableWidth/2),tableHeight-roomSize,-1.5*roomSize+(2*tableWidth/6));
+scene.add(table);
+
+// table by the couch
+var sideTable = createTexturedTable(tableHeight, tableWidth/2, tableWidth/3, 'table.jpg', 1);
+sideTable.position.set(-roomSize-(tableWidth/4), tableHeight-roomSize, roomSize + tableWidth/4);
+scene.add(sideTable);
+
+var vase = createVase(0xCC33FF);
+vase.position.set(-roomSize-(tableWidth/4), tableHeight-roomSize + 0.1, roomSize + tableWidth/4);
+scene.add(vase);
+
+var tv = createTV(roomSize, roomSize*0.6,4);
+tv.position.set(roomSize*1.5-2, 0, roomSize*0.5);
+tv.rotation.y =-0.5*Math.PI;
+scene.add(tv);
+
+// the paintings
+var sailPainting = addPainting(60,60,'sailboat.jpg');
+sailPainting.position.set(-1.5*roomSize,0.25*roomSize,roomSize);
+sailPainting.rotation.y=0.5*Math.PI;
+scene.add(sailPainting);
+
+var lightPainting = addPainting(100,80,'lighthouse.jpg');
+lightPainting.translateZ(-1.5*roomSize);
+lightPainting.translateY(0.25*roomSize);
+scene.add(lightPainting);
+
+// Presents under the tree
+var p1 = addPresent(40,10,40,presentTexture1,roomSize+15,-roomSize,-roomSize+40);
+var p2 = addPresent(20,20,20,presentTexture2,roomSize+20,-roomSize,-.2*roomSize);
+var p3 = addPresent(50,30,40,presentTexture3,.2*roomSize,-roomSize,-roomSize+40);
+var p4 = addPresent(35,25,30, presentTexture4, .8*roomSize,-roomSize,-.2*roomSize);
+var p12 = addPresent(20,25,25, presentTexture12,roomSize+15,-roomSize+10,-roomSize+40);
+var p14 = addPresent(30,40,20,presentTexture14,.4*roomSize,-roomSize,-.2*roomSize);
+var p15 = addPresent(15,15,30, presentTexture15,.8*roomSize,-roomSize+25,-.2*roomSize);
+var p16 = addPresent(50,30,20, presentTexture10,roomSize,-roomSize,-1.1*roomSize);
+var p17 = addPresent(30,30,30, presentTexture5,.5*roomSize,-roomSize,-1.2*roomSize);
+var p18 = addPresent(15,15,15, presentTexture6,.2*roomSize, -roomSize+30, -roomSize+40) // same x and z as p3
+
+
+// presents on the table
+var p5 = addPresent(30,20,30, presentTexture5, -roomSize+25,tableHeight-roomSize, -1.5*roomSize+(2*tableWidth/6));
+var p9 = addPresent(40,25,60, presentTexture9, -roomSize*1.5 + 20, tableHeight-roomSize, -1.5*roomSize+(2*tableWidth/6));
+var p10 = addPresent(30,30,30, presentTexture10, -roomSize*1.5+20, tableHeight-roomSize+25,-1.5*roomSize+(2*tableWidth/6));
+var p11 = addPresent(20,10,10, presentTexture11,-roomSize*1.5 + 20, tableHeight-roomSize+55,-1.5*roomSize+(2*tableWidth/6));
+var p13 = addPresent(20,40,20,presentTexture13,-roomSize*1.5+50,tableHeight-roomSize,-1.5*roomSize+(2*tableWidth/6));
+
+//presents under the table
+var p6 = addPresent(40,40,45, presentTexture6, -roomSize*1.5 + 22, -roomSize, -1.5*roomSize+(2*tableWidth/6));
+var p7 = addPresent(40,20,40, presentTexture7, -roomSize*1.5 + 65, -roomSize, -1.5*roomSize+(2*tableWidth/6));
+var p8 = addPresent(20,20,20,presentTexture8, -roomSize*1.5 + 65, -roomSize+20, -1.5*roomSize+(2*tableWidth/6));
+
+
+
+
+// create a directional light and ambient light and add it to the scene
+var directionalLight = new THREE.DirectionalLight( 0xffffff, .05);
+directionalLight.position.set( 0, 10, 0.1 );
+directionalLight.target = tv;
+scene.add( directionalLight );
+
+var hemisphereLight = new THREE.HemisphereLight("rgb(252,255,255)",0xB2B2B2,.4); // set skyColorHex and groundColorHex to white
+scene.add(hemisphereLight);
+
+var ambientLight = new THREE.AmbientLight(0x333333);
+scene.add(ambientLight);
+
+// renderer
+var renderer = new THREE.WebGLRenderer();
+TW.mainInit(renderer,scene);
+
+
+TW.cameraSetup(renderer,
+               scene,
+               {minx: -roomSize, maxx: roomSize,
+                miny: -roomSize, maxy: roomSize,
+                minz: -roomSize , maxz: roomSize });
+
+// ==================================================================
+// animate the scene
+
+// State variables of the animation
+
+function makeScene() {
+
+  /* for loop that goes through the light array 
+   * and depending on the time, make different lights blink
+   */
+ for(var i = 0; i < lightArray.length; i++){
+  if(time%2 == 0) {
+    if(i %2 == 0)
+      lightArray[i].material.emissive.setHex(0xFFFB00); // make lights yellow
+    else
+      lightArray[i].material.emissive.setHex(0x00000); // make lights black
+  }
+  else {
+    if(i%2 == 0)
+      lightArray[i].material.emissive.setHex(0x00000); // make lights black
+    else
+      lightArray[i].material.emissive.setHex(0xFFFB00); // make lights yellow
+  }
+ }
+}
+makeScene();
+
+function updateState() {
+  time = new Date().getSeconds();
+  makeScene();
+}
+
+function oneStep() {
+  updateState();
+  TW.render();
+}
+
+var animationId = null;
+
+function animate(timestamp){
+  oneStep();
+  animationId = requestAnimationFrame(animate);
+}
+
+animate();
+
+</script>
+</div>
+
+<div id = "explainations">
+<h2><em><strong>Lighting</strong></em></h2>
+<p>Our scene contains the following three lights:</p>
+<ul>
+  <li>Hemisphere light from above to help light up the entire room.</li>
+  <li>Ambient light for the scene to add extra light to each object.</li>
+  <li>Diretional light that targets the TV in order to show that it is reflective.</li>
+</ul>
+
+
+<h2 id = "tree"><em><strong>The Tree</strong></em></h2>
+<p>The main feature in this scene is the tree.</p>
+<figure><img src="evergreen.png" alt="Just the plain evergreen tree" style = "align:middle">
+<figcaption>Evergreen Tree</figcaption></figure>
+<figure><img src="ChristmasTree.png" alt="Christmas tree with all the decorations on it!" style = "align:middle">
+<figcaption>Evergreen tree with added lights, star, and skirt</figcaption></figure>
+<p style="font-size: 20px"><em>Components of the tree in the scene:</em></p>
+<ul>
+  <li>Evergreen Tree</li>
+    <ul>
+      <li>Created using cylinder geometries and two textures for the tree and the bark.</li>
+    </ul>
+
+  <li>Christmas Lights</li>
+    <ul>
+      <li>The Christmas lights we created work specifically for our evergreen tree.</li>
+      <li>Each light on the Christmas tree is an individual object made from a sphere.</li>
+      <li>The emissive property of each sphere is turned on to make the lights seem like they are glowing.</li>
+      <li>Each segment of the tree has three ringss of lights.</li>
+      <li>The number of lights per ring depends on the width of the segement we are placing them on.</li>
+      <li>The lights alternate blinking depending on the time.</li>
+      <li>The lights were originally part of the Christmas tree we placed in the class library. However, we decided to remove them in order to allow students to access an evergreen tree for more general use. Going through the process of changing our code to remove the lights enabled us to easily access each individual light. This allowed us to update our animation to simply change the emissive color of each light, and solve the errors with load time we experienced in the alpha version.
+    </ul>
+
+  <li>The Star</li>
+    <ul>
+      <li>Discussed in further detail below.</li>
+    </ul>
+
+  <li>The Skirt</li>
+    <ul>
+      <li>The skirt is created using a Cylinder Geometry.</li>
+      <li>The Cylinder Geometry has </li>
+        <ul>
+          <li>the same radius for the top and the bottom.</li>
+          <li>a very small height to make it flat.</li>
+          <li>a radius segment of 8, so the skirt looks like a octagon.</li>
+        </ul>
+
+    </ul>
+  </ul>
+
+<h2 id = "star">The Star</h2>
+    <img src="star.png" alt="screenshot of the star from the front">
+    <img src="starSide.png" alt="screenshot of the star from the side">
+  <ul>
+    <li>The star is first created using a Shape, drawing lines to connect points. The shape is then made into a geometry using Shape Geometry. (See the image on the left.)</li>
+      <li>The final star geometry is created by extruding the flat star, making it 3-dimensional. (See the image on the right.)</li>
+      <li>The star also uses the emissive property to make it appear brighter.</li>
+    </ul>
+
+<h2 id = "tv">The TV</h2>
+  <img src="tv.png" alt="screenshot of TV">
+  <ul>
+    <li>The TV is created using a BoxGeometry for the frame and a PlaneGeometry for the screen.</li>
+    <li>Both the frame and the screen are black. While the frame uses a basic material to remain solid black, the screen is made from a phong material that reflects the light, making it appear grey.</li>
+  </ul>
+
+
+<h2 id = "vase">The Vase</h2>
+<img src="vase.png" alt="the vase on the side table">
+  <ul>
+    <li>The vase is created using a LatheGeometry for the body of the vase and a small PlaneGeometry for bottom of the vase.</li>
+    <li>The transparent property of the vase is set to true and the opacity is set to 0.9 to make the vase appear glass-like.</li>
+  </ul>
+
+<h2 id = "couch">The Couch</h2>
+<img src="couch.png" alt="the cushioned couch!">
+  <ul>
+    <li>The couch combines multiple box and cylinder geometries. The boxes are used to create the structure of the couch and the cylinders are used to created the rounded edges.</li>
+    <li><span  style = 'color:red'><strong><em>NOTE: </em></strong></span>Despite its simplicity, this couch appears <strong>very </strong>comfortable.</li>
+    <li>The couch comes with <strong><span style = 'color:rgb(0,191,255)'>CUSHIONS!</span></strong> (no added charge)</li>
+    <li>The couch uses MeshPhongMaterial so that it can interact with light, displaying its creative geometries.</li>
+    </ul>
+
+<h2 id = "presents&paintings">The Presents & Paintings</h2>
+<img src="presents.png" alt="pile of presents on and under the table" >
+<img src="sailboat.jpg" alt="the sailboat painting" width = "30%" height = "30%">
+<img src="lighthouse.jpg" alt="the lighthouse painting" width = "30%" height = "30%">
+<ul>
+  <li style = "font-size:20px"><b><em>The Presents</em></b></li>
+    <ul>
+      <li>Each present in the scene is created individually using a box and texture mapped.</li>
+      <li>For this scene, we created many presents to place under the tree, on top of the table, and under the table.</li>
+    </ul>
+
+  <li style = 'font-size:20px'><b><em>Paintings</em></b></li>
+    <ul>
+      <li>Each paiting created using a plane and mapping a texture onto it.</li>
+      <li>We added two paintings to our scene-- the sailboat painting and the lighthouse painting-- to give the room a homey feeling.</li>
+    </ul>
+
+  </ul>
+
+<h2>Library Usage</h2>
+<ul>
+  <li><b>Room</b>: The room we used in this scene is borrowed from Susie and Francys's library contribution.</li>
+    <ul>
+      <li>The wall, ceiling, and floor of the room all have different textures.
+    </ul>
+
+  <li><b>Tables</b>: The tables we used in this scene are also based on Susie and Francys's library contriubution</li>
+    <ul>
+      <li>We modified Susie and Francys's table slightly so that the table would take in the depth as well.</li>
+    </ul>
+  </ul>
+
+  <h3 style = "margin:0px">Texture Sources</h3>
+  <ul style = "font-size:14px; margin: 5px auto;">
+    <li>Evergreen textures:</li>
+    <ul style = "font-size:12px">
+      <li>http://rosswarner.com/shrub.html</li>
+      <li>http://telias.free.fr/textures_tex/trees/bark-rough.jpg</li>
+    </ul>
+    <li>Sailboat painting: http://bartlettfineart.com/Fine-Art-Paintings/Marine-Art/marine-art-10.html</li>
+    <li>Lighhouse painting: http://www.ship-paintings.com/travel-sketches/pemaquid-point-lighthouse.htm</li>
+    <li>Table texture: http://www.texturex.com/Wood-Textures/wood+grain+texture+table+surface+brown+stock+photo+design.jpg.php</li>
+    <li>Floor texture: http://3.bp.blogspot.com/-C3u0YMfP9Lc/UXbF5z-XbjI/AAAAAAAAAGY/jX3I8_CUvZA/s1600/Wood_floor_texture_sketchup_warehouse_type085.jpg</li>
+    <li>Ceiling texture: http://www.admira.sg/sites/default/files/product/jbg_5114_s_off_white_premium_leather_0.jpg</li>
+    <li>Wall texture: http://thumbs.dreamstime.com/z/vintage-wallpaper-pattern-22111560.jpg</li>
+    <li>Present textures:</li>
+    <ul style = "font-size:12px">
+      <li>https://cgcookie.com/blender/files/2009/12/cgcookie_wrapping_paper_04.jpg</li>
+      <li>http://www.tntnphotos.com/2014/06/34698/green-christmas-background-zx7peulm/</li>
+      <li>https://s-media-cache-ak0.pinimg.com/236x/01/14/43/011443dfe9f0d8e9f97f7938b2fc4732.jpg</li>
+      <li>http://www.give2thetroops.org/images/paper.jpg</li>
+      <li>http://st.depositphotos.com/1446170/1250/v/950/depositphotos_12506535-Seamless-pattern-with-Christmas-presents-and-snowflakes.jpg</li>
+      <li>http://thumbs.dreamstime.com/z/gift-pattern-background-file-eps-format-35635008.jpg</li>
+      <li>http://ecx.images-amazon.com/images/I/81norBtCkML._SL1000_.jpg</li>
+      <li>http://giftwrapsolutions.com/assets/X-9053-SnowflakeSwirl.jpg</li>
+      <li>http://www.macpaper.com/gw/zooms/ZS-M5417.jpg</li>
+      <li>https://cgcookie.com/blender/files/2009/12/cgcookie_wrapping_paper_01.jpg</li>
+      <li>http://i109.photobucket.com/albums/n44/nascargirl1124/Christmas/christmas-snowflakes-wallpapers-2.jpg</li>
+      <li>http://www.n8w.com/wp/wp-content/uploads/2011/06/ll7.png</li>
+      <li>http://thumbs.dreamstime.com/z/christmas-gifts-seamless-pattern-retro-decorations-isolated-white-background-useful-also-as-design-element-35621974.jpg</li>
+      <li>http://thumbs.dreamstime.com/z/seamless-christmas-pattern-snowflakes-trees-background-gift-wrap-34276659.jpg</li>
+      <li>http://thumbs.dreamstime.com/x/christmas-seamless-texture-snowflakes-21653889.jpg</li>
+      <li>http://www.zingerbug.com/Backgrounds/background_images/purple_christmas_lights_texture_seamless.jpg</li>
+
+      <ul>
+  </ul>
+
+
+
+
+</div>
+</body>
+</html>
